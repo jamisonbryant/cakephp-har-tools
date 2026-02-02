@@ -6,7 +6,9 @@ namespace JamisonBryant\CakephpHarRecorder;
 use Cake\Core\BasePlugin;
 use Cake\Core\Configure;
 use Cake\Core\PluginApplicationInterface;
+use Cake\Console\CommandCollection;
 use Cake\Http\MiddlewareQueue;
+use JamisonBryant\CakephpHarRecorder\Command\HarReplayCommand;
 use JamisonBryant\CakephpHarRecorder\Middleware\HarRecorderMiddleware;
 
 class CakephpHarRecorderPlugin extends BasePlugin
@@ -20,6 +22,21 @@ class CakephpHarRecorderPlugin extends BasePlugin
     public function bootstrap(PluginApplicationInterface $app): void
     {
         parent::bootstrap($app);
+    }
+
+    /**
+     * Register plugin commands.
+     *
+     * @param \Cake\Console\CommandCollection $commands The command collection.
+     * @return \Cake\Console\CommandCollection
+     */
+    public function console(CommandCollection $commands): CommandCollection
+    {
+        $commands = parent::console($commands);
+
+        $commands->add('har:replay', HarReplayCommand::class);
+
+        return $commands;
     }
 
     /**

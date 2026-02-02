@@ -9,9 +9,9 @@
 
 A CakePHP 5 toolkit for working with HAR (HTTP Archive) data, including recorder middleware, redaction utilities, and file writing helpers.
 
-## Recording, not replaying
+## Recording first, replaying experimental
 
-This plugin focuses on capturing HAR output for debugging, support, and audit trails. It does not replay or mock HTTP traffic.
+This plugin focuses on capturing HAR output for debugging, support, and audit trails. A minimal, best-effort CLI replay command is included for experimentation and may not reproduce all browser semantics.
 
 ## Tools
 
@@ -41,6 +41,20 @@ bin/cake plugin load CakephpHarRecorder
 ## Usage
 
 The plugin registers middleware automatically when enabled.
+
+### Replay (experimental)
+
+Replay a HAR file from the CLI:
+
+```
+bin/cake har:replay path/to/recording.har
+```
+
+Useful options:
+
+```
+bin/cake har:replay path/to/recording.har --dry-run --limit 10 --base-url https://staging.example.com
+```
 
 ### Configure
 
