@@ -39,3 +39,4 @@ Thumbs.db
 nbproject/*
 # Visual Studio Code
 .vscode
+/phpstan.local.neon
