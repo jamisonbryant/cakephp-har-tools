@@ -56,6 +56,7 @@ Useful options:
 
 ```
 bin/cake har:replay path/to/recording.har --limit 10 --base-url https://staging.example.com
+bin/cake har:replay path/to/recording.har --methods GET,POST --limit 10
 bin/cake har:replay path/to/recording.har --send --limit 10 --base-url https://staging.example.com
 ```
 

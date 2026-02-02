@@ -34,6 +34,11 @@ class HarReplayCommand extends Command
                 'help' => 'Print the requests without sending them (default).',
                 'boolean' => true,
             ])
+            ->addOption('methods', [
+                'help' => 'Comma-separated list of HTTP methods to replay.',
+                'short' => 'm',
+                'default' => 'GET',
+            ])
             ->addOption('limit', [
                 'help' => 'Limit the number of entries to replay (0 = all).',
                 'default' => '0',
@@ -92,9 +97,15 @@ class HarReplayCommand extends Command
         $baseUrl = $args->getOption('base-url');
         $send = (bool)$args->getOption('send');
         $dryRun = !$send;
+        $allowedMethods = $this->parseAllowedMethods((string)$args->getOption('methods'));
 
         if ($send && (bool)$args->getOption('dry-run')) {
             $io->err('Options --send and --dry-run cannot be used together.');
+
+            return static::CODE_ERROR;
+        }
+        if ($allowedMethods === []) {
+            $io->err('Option --methods must include at least one HTTP method.');
 
             return static::CODE_ERROR;
         }
@@ -113,6 +124,9 @@ class HarReplayCommand extends Command
             }
 
             $method = strtoupper((string)($request['method'] ?? 'GET'));
+            if (!isset($allowedMethods[$method])) {
+                continue;
+            }
             $url = (string)($request['url'] ?? '');
             if ($url === '' || !preg_match('/^https?:\/\//i', $url)) {
                 $io->err('Skipping entry without a valid http(s) URL.');
@@ -201,6 +215,24 @@ class HarReplayCommand extends Command
         $response = $client->request($method, $url, $options);
 
         return $response->getStatusCode();
+    }
+
+    /**
+     * @param string $methods
+     * @return array<string, true>
+     */
+    protected function parseAllowedMethods(string $methods): array
+    {
+        $parsed = [];
+        foreach (explode(',', $methods) as $method) {
+            $method = strtoupper(trim($method));
+            if ($method === '') {
+                continue;
+            }
+            $parsed[$method] = true;
+        }
+
+        return $parsed;
     }
 
     /**

@@ -15,7 +15,7 @@ class HarReplayCommandTest extends TestCase
 {
     public function testExecuteDefaultsToDryRun(): void
     {
-        $path = $this->writeHarFile();
+        $path = $this->writeHarFile(['GET', 'POST']);
         try {
             $command = new class extends HarReplayCommand {
                 public array $sent = [];
@@ -37,6 +37,7 @@ class HarReplayCommandTest extends TestCase
 
             $this->assertSame(CommandInterface::CODE_SUCCESS, $result);
             $this->assertStringContainsString('DRY RUN GET https://example.com', $out->output());
+            $this->assertStringContainsString('Replayed 1 request(s).', $out->output());
             $this->assertSame([], $command->sent);
             $this->assertSame('', $err->output());
         } finally {
@@ -46,7 +47,7 @@ class HarReplayCommandTest extends TestCase
 
     public function testExecuteSendsWhenSendOptionProvided(): void
     {
-        $path = $this->writeHarFile();
+        $path = $this->writeHarFile(['GET']);
         try {
             $command = new class extends HarReplayCommand {
                 public array $sent = [];
@@ -69,6 +70,39 @@ class HarReplayCommandTest extends TestCase
             $this->assertSame(CommandInterface::CODE_SUCCESS, $result);
             $this->assertStringContainsString('GET https://example.com -> 204', $out->output());
             $this->assertCount(1, $command->sent);
+            $this->assertSame('', $err->output());
+        } finally {
+            @unlink($path);
+        }
+    }
+
+    public function testExecuteAllowsCustomMethods(): void
+    {
+        $path = $this->writeHarFile(['GET', 'POST']);
+        try {
+            $command = new class extends HarReplayCommand {
+                public array $sent = [];
+
+                protected function sendRequest(Client $client, string $method, string $url, array $options): int
+                {
+                    $this->sent[] = [$method, $url, $options];
+
+                    return 200;
+                }
+            };
+
+            $args = $this->makeArguments($command, ['--methods', 'get,post'], $path);
+            $out = new StubConsoleOutput();
+            $err = new StubConsoleOutput();
+            $io = new ConsoleIo($out, $err);
+
+            $result = $command->execute($args, $io);
+
+            $this->assertSame(CommandInterface::CODE_SUCCESS, $result);
+            $this->assertStringContainsString('DRY RUN GET https://example.com', $out->output());
+            $this->assertStringContainsString('DRY RUN POST https://example.com', $out->output());
+            $this->assertStringContainsString('Replayed 2 request(s).', $out->output());
+            $this->assertSame([], $command->sent);
             $this->assertSame('', $err->output());
         } finally {
             @unlink($path);
@@ -146,22 +180,20 @@ class HarReplayCommandTest extends TestCase
         return new Arguments($arguments, $options, $parser->argumentNames());
     }
 
-    private function writeHarFile(): string
+    private function writeHarFile(array $methods = ['GET']): string
     {
         $path = (string)tempnam(sys_get_temp_dir(), 'har');
-        $payload = [
-            'log' => [
-                'entries' => [
-                    [
-                        'request' => [
-                            'method' => 'GET',
-                            'url' => 'https://example.com',
-                            'headers' => [],
-                        ],
-                    ],
+        $entries = [];
+        foreach ($methods as $method) {
+            $entries[] = [
+                'request' => [
+                    'method' => $method,
+                    'url' => 'https://example.com',
+                    'headers' => [],
                 ],
-            ],
-        ];
+            ];
+        }
+        $payload = ['log' => ['entries' => $entries]];
 
         file_put_contents($path, json_encode($payload, JSON_THROW_ON_ERROR));
 
