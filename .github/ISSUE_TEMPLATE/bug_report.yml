@@ -1,5 +1,5 @@
 name: Bug report
-description: Report a problem with cakephp-har-recorder
+description: Report a problem with cakephp-har-tools
 labels: ["bug"]
 body:
   - type: textarea

@@ -1,6 +1,6 @@
 {
   "name": "jamisonbryant/cakephp-har-recorder",
-  "description": "CakePHP 5 plugin that records HTTP requests and responses as HAR files.",
+  "description": "CakePHP 5 toolkit for working with HAR data, starting with a recorder middleware.",
   "type": "cakephp-plugin",
   "license": "MIT",
   "require": {

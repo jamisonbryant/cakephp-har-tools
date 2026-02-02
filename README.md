@@ -1,17 +1,21 @@
-# CakephpHarRecorder
+# CakephpHarTools
 
-[![CI](https://github.com/jamisonbryant/cakephp-har-recorder/actions/workflows/ci.yml/badge.svg)](https://github.com/jamisonbryant/cakephp-har-recorder/actions/workflows/ci.yml)
-[![Coverage](https://codecov.io/gh/jamisonbryant/cakephp-har-recorder/branch/main/graph/badge.svg)](https://codecov.io/gh/jamisonbryant/cakephp-har-recorder)
+[![CI](https://github.com/jamisonbryant/cakephp-har-tools/actions/workflows/ci.yml/badge.svg)](https://github.com/jamisonbryant/cakephp-har-tools/actions/workflows/ci.yml)
+[![Coverage](https://codecov.io/gh/jamisonbryant/cakephp-har-tools/branch/main/graph/badge.svg)](https://codecov.io/gh/jamisonbryant/cakephp-har-tools)
 [![AI Assisted](https://img.shields.io/badge/AI-assisted-yes?style=flat-square)](#ai-disclosure)
 [![Latest Stable Version](https://img.shields.io/packagist/v/jamisonbryant/cakephp-har-recorder?style=flat-square)](https://packagist.org/packages/jamisonbryant/cakephp-har-recorder)
 [![Total Downloads](https://img.shields.io/packagist/dt/jamisonbryant/cakephp-har-recorder?style=flat-square)](https://packagist.org/packages/jamisonbryant/cakephp-har-recorder/stats)
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE)
 
-A CakePHP 5 plugin that records HTTP requests and responses as HAR (HTTP Archive) files via middleware.
+A CakePHP 5 toolkit for working with HAR (HTTP Archive) data, starting with a recorder middleware.
 
 ## Recording, not replaying
 
 This plugin focuses on capturing HAR output for debugging, support, and audit trails. It does not replay or mock HTTP traffic.
+
+## Tools
+
+- HAR Recorder: middleware that captures HTTP traffic as HAR files.
 
 ## Installation
 
