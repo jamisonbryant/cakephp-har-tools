@@ -26,21 +26,25 @@ class HarReplayCommand extends Command
             ->addOption('base-url', [
                 'help' => 'Override scheme/host (and optional path) for all requests.',
             ])
+            ->addOption('send', [
+                'help' => 'Send requests (default is dry run).',
+                'boolean' => true,
+            ])
             ->addOption('dry-run', [
-                'help' => 'Print the requests without sending them.',
+                'help' => 'Print the requests without sending them (default).',
                 'boolean' => true,
             ])
             ->addOption('limit', [
                 'help' => 'Limit the number of entries to replay (0 = all).',
-                'default' => 0,
+                'default' => '0',
             ])
             ->addOption('sleep', [
                 'help' => 'Milliseconds to wait between requests.',
-                'default' => 0,
+                'default' => '0',
             ])
             ->addOption('timeout', [
                 'help' => 'Request timeout in seconds.',
-                'default' => 30,
+                'default' => '30',
             ]);
 
         return $parser;
@@ -86,7 +90,14 @@ class HarReplayCommand extends Command
         $sleepMs = (int)$args->getOption('sleep');
         $timeout = (int)$args->getOption('timeout');
         $baseUrl = $args->getOption('base-url');
-        $dryRun = (bool)$args->getOption('dry-run');
+        $send = (bool)$args->getOption('send');
+        $dryRun = !$send;
+
+        if ($send && (bool)$args->getOption('dry-run')) {
+            $io->err('Options --send and --dry-run cannot be used together.');
+
+            return static::CODE_ERROR;
+        }
 
         $client = new Client(['timeout' => $timeout]);
         $replayed = 0;
@@ -118,8 +129,8 @@ class HarReplayCommand extends Command
                 $io->out(sprintf('DRY RUN %s %s', $method, $url));
             } else {
                 try {
-                    $response = $client->request($method, $url, $options);
-                    $io->out(sprintf('%s %s -> %d', $method, $url, $response->getStatusCode()));
+                    $statusCode = $this->sendRequest($client, $method, $url, $options);
+                    $io->out(sprintf('%s %s -> %d', $method, $url, $statusCode));
                 } catch (\Throwable $exception) {
                     $io->err(sprintf('Failed %s %s: %s', $method, $url, $exception->getMessage()));
                 }
@@ -176,6 +187,20 @@ class HarReplayCommand extends Command
         }
 
         return $options;
+    }
+
+    /**
+     * @param \Cake\Http\Client $client
+     * @param string $method
+     * @param string $url
+     * @param array<string, mixed> $options
+     * @return int
+     */
+    protected function sendRequest(Client $client, string $method, string $url, array $options): int
+    {
+        $response = $client->request($method, $url, $options);
+
+        return $response->getStatusCode();
     }
 
     /**
