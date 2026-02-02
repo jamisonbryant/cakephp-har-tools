@@ -50,10 +50,13 @@ Replay a HAR file from the CLI:
 bin/cake har:replay path/to/recording.har
 ```
 
+By default, replay is a dry run. Pass `--send` to actually send requests.
+
 Useful options:
 
 ```
-bin/cake har:replay path/to/recording.har --dry-run --limit 10 --base-url https://staging.example.com
+bin/cake har:replay path/to/recording.har --limit 10 --base-url https://staging.example.com
+bin/cake har:replay path/to/recording.har --send --limit 10 --base-url https://staging.example.com
 ```
 
 ### Configure
