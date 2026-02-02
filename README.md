@@ -53,8 +53,10 @@ The plugin ships with defaults in `config/har_recorder.php`. Override in your ap
     'outputDir' => 'logs/har',
     'filenamePattern' => 'har-{date}-{uniqid}.har',
     'redactions' => [
-        'log.entries[0].request.headers[*].value' => '/Bearer\s+[^\s]+/i',
-        'log.entries[0].request.postData.text' => '/"password"\s*:\s*"[^"]+"/i',
+        'log.entries[*].request.headers[*]' => '/^(authorization|cookie|x-api-key|proxy-authorization)$/i',
+        'log.entries[*].response.headers[*]' => '/^(authorization|cookie|x-api-key|proxy-authorization)$/i',
+        'log.entries[*].request.postData.text' => '/"(token|access_token|refresh_token|password|secret|api_key)"\s*:\s*"[^"]*"/i',
+        'log.entries[*].response.content.text' => '/"(token|access_token|refresh_token|password|secret|api_key)"\s*:\s*"[^"]*"/i',
     ],
     'maxBodySize' => 1048576,
 ],
@@ -70,6 +72,10 @@ Redaction keys use a JMESPath-like subset supporting:
 - Quoted keys: `['key-name']` or `["key-name"]`
 
 Matches apply regex replacement with `[REDACTED]`.
+When a path targets a header object like `log.entries[*].request.headers[*]`,
+the regex is matched against the header name and the value is redacted.
+The defaults include common sensitive headers and JSON keys. Set `redactions` to an empty
+array to disable them or override with your own rules.
 
 ## Documentation
 
