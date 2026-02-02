@@ -8,6 +8,9 @@ use Cake\Console\Arguments;
 use Cake\Console\ConsoleIo;
 use Cake\Console\ConsoleOptionParser;
 use Cake\Http\Client;
+use Cake\Http\Client\Request as ClientRequest;
+use JsonException;
+use Throwable;
 
 class HarReplayCommand extends Command
 {
@@ -78,7 +81,7 @@ class HarReplayCommand extends Command
 
         try {
             $har = json_decode($contents, true, 512, JSON_THROW_ON_ERROR);
-        } catch (\JsonException $exception) {
+        } catch (JsonException $exception) {
             $io->err(sprintf('Invalid HAR JSON: %s', $exception->getMessage()));
 
             return static::CODE_ERROR;
@@ -145,7 +148,7 @@ class HarReplayCommand extends Command
                 try {
                     $statusCode = $this->sendRequest($client, $method, $url, $options);
                     $io->out(sprintf('%s %s -> %d', $method, $url, $statusCode));
-                } catch (\Throwable $exception) {
+                } catch (Throwable $exception) {
                     $io->err(sprintf('Failed %s %s: %s', $method, $url, $exception->getMessage()));
                 }
             }
@@ -212,7 +215,42 @@ class HarReplayCommand extends Command
      */
     protected function sendRequest(Client $client, string $method, string $url, array $options): int
     {
-        $response = $client->request($method, $url, $options);
+        $method = strtoupper($method);
+        $data = [];
+        if (array_key_exists('body', $options)) {
+            $data = $options['body'];
+            unset($options['body']);
+        } elseif (array_key_exists('form', $options)) {
+            $data = $options['form'];
+            unset($options['form']);
+        }
+
+        switch ($method) {
+            case 'GET':
+                $response = $client->get($url, $data, $options);
+                break;
+            case 'POST':
+                $response = $client->post($url, $data, $options);
+                break;
+            case 'PUT':
+                $response = $client->put($url, $data, $options);
+                break;
+            case 'PATCH':
+                $response = $client->patch($url, $data, $options);
+                break;
+            case 'OPTIONS':
+                $response = $client->options($url, $data, $options);
+                break;
+            case 'DELETE':
+                $response = $client->delete($url, $data, $options);
+                break;
+            case 'HEAD':
+                $response = $client->head($url, (array)$data, $options);
+                break;
+            default:
+                $request = new ClientRequest($url, $method, $options['headers'] ?? [], $data);
+                $response = $client->send($request, $options);
+        }
 
         return $response->getStatusCode();
     }
@@ -236,7 +274,7 @@ class HarReplayCommand extends Command
     }
 
     /**
-     * @param array<int, array<string, mixed>> $headers
+     * @param array<int, mixed> $headers
      * @return array<string, string>
      */
     protected function normalizeHeaders(array $headers): array
@@ -263,6 +301,11 @@ class HarReplayCommand extends Command
         return $normalized;
     }
 
+    /**
+     * @param string $url
+     * @param string $baseUrl
+     * @return string
+     */
     protected function applyBaseUrl(string $url, string $baseUrl): string
     {
         $base = parse_url($baseUrl);

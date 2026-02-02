@@ -41,7 +41,9 @@ class HarReplayCommandTest extends TestCase
             $this->assertSame([], $command->sent);
             $this->assertSame('', $err->output());
         } finally {
-            @unlink($path);
+            if (is_file($path)) {
+                unlink($path);
+            }
         }
     }
 
@@ -72,7 +74,9 @@ class HarReplayCommandTest extends TestCase
             $this->assertCount(1, $command->sent);
             $this->assertSame('', $err->output());
         } finally {
-            @unlink($path);
+            if (is_file($path)) {
+                unlink($path);
+            }
         }
     }
 
@@ -105,7 +109,9 @@ class HarReplayCommandTest extends TestCase
             $this->assertSame([], $command->sent);
             $this->assertSame('', $err->output());
         } finally {
-            @unlink($path);
+            if (is_file($path)) {
+                unlink($path);
+            }
         }
     }
 
@@ -125,7 +131,9 @@ class HarReplayCommandTest extends TestCase
             $this->assertSame(CommandInterface::CODE_ERROR, $result);
             $this->assertStringContainsString('Options --send and --dry-run cannot be used together.', $err->output());
         } finally {
-            @unlink($path);
+            if (is_file($path)) {
+                unlink($path);
+            }
         }
     }
 
@@ -165,7 +173,7 @@ class HarReplayCommandTest extends TestCase
 
         $result = $command->applyBase(
             'https://prod.example.com/v1/users?active=1',
-            'https://staging.example.com/api'
+            'https://staging.example.com/api',
         );
 
         $this->assertSame('https://staging.example.com/api/v1/users?active=1', $result);

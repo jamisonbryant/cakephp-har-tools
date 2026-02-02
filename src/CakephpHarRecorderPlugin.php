@@ -3,10 +3,10 @@ declare(strict_types=1);
 
 namespace JamisonBryant\CakephpHarRecorder;
 
+use Cake\Console\CommandCollection;
 use Cake\Core\BasePlugin;
 use Cake\Core\Configure;
 use Cake\Core\PluginApplicationInterface;
-use Cake\Console\CommandCollection;
 use Cake\Http\MiddlewareQueue;
 use JamisonBryant\CakephpHarRecorder\Command\HarReplayCommand;
 use JamisonBryant\CakephpHarRecorder\Middleware\HarRecorderMiddleware;
