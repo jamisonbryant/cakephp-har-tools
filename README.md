@@ -1,6 +1,8 @@
 # CakephpHarRecorder
 
 [![CI](https://github.com/jamisonbryant/cakephp-har-recorder/actions/workflows/ci.yml/badge.svg)](https://github.com/jamisonbryant/cakephp-har-recorder/actions/workflows/ci.yml)
+[![Coverage](https://codecov.io/gh/jamisonbryant/cakephp-har-recorder/branch/main/graph/badge.svg)](https://codecov.io/gh/jamisonbryant/cakephp-har-recorder)
+[![AI Assisted](https://img.shields.io/badge/AI-assisted-yes?style=flat-square)](#ai-disclosure)
 [![Latest Stable Version](https://img.shields.io/packagist/v/jamisonbryant/cakephp-har-recorder?style=flat-square)](https://packagist.org/packages/jamisonbryant/cakephp-har-recorder)
 [![Total Downloads](https://img.shields.io/packagist/dt/jamisonbryant/cakephp-har-recorder?style=flat-square)](https://packagist.org/packages/jamisonbryant/cakephp-har-recorder/stats)
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE)
@@ -72,6 +74,10 @@ This README and `config/har_recorder.php` are the primary documentation for now.
 ## IDE compatibility improvements
 
 No special IDE helpers are required. Standard PHP type hints and PSR interfaces provide autocomplete support.
+
+## AI Disclosure
+
+This project was developed with AI assistance and reviewed by the maintainer.
 
 ## Notes
 
