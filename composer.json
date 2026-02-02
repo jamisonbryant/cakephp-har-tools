@@ -1,6 +1,6 @@
 {
   "name": "jamisonbryant/cakephp-har-recorder",
-  "description": "CakePHP 5 toolkit for working with HAR data, starting with a recorder middleware.",
+  "description": "CakePHP 5 toolkit for working with HAR data, including recorder middleware, redaction utilities, and file writing helpers.",
   "type": "cakephp-plugin",
   "license": "MIT",
   "require": {

@@ -7,7 +7,7 @@
 [![Total Downloads](https://img.shields.io/packagist/dt/jamisonbryant/cakephp-har-recorder?style=flat-square)](https://packagist.org/packages/jamisonbryant/cakephp-har-recorder/stats)
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE)
 
-A CakePHP 5 toolkit for working with HAR (HTTP Archive) data, starting with a recorder middleware.
+A CakePHP 5 toolkit for working with HAR (HTTP Archive) data, including recorder middleware, redaction utilities, and file writing helpers.
 
 ## Recording, not replaying
 
