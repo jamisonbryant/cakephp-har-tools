@@ -1,26 +1,38 @@
 <?php
-
 declare(strict_types=1);
 
 namespace JamisonBryant\CakephpHarRecorder\Service;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Message\StreamInterface;
 
 class HarEncoder
 {
     private array $config;
 
+    /**
+     * @param array<string, mixed> $config Configuration options.
+     */
     public function __construct(array $config = [])
     {
         $this->config = $config;
     }
 
+    /**
+     * Encode request/response into a HAR structure.
+     *
+     * @param \Psr\Http\Message\ServerRequestInterface $request Request instance.
+     * @param \Psr\Http\Message\ResponseInterface $response Response instance.
+     * @param float $startedAt Start time (microtime true).
+     * @param float $endedAt End time (microtime true).
+     * @return array<string, mixed>
+     */
     public function encode(
         ServerRequestInterface $request,
         ResponseInterface $response,
         float $startedAt,
-        float $endedAt
+        float $endedAt,
     ): array {
         $requestBody = $this->readStream($request->getBody());
         $responseBody = $this->readStream($response->getBody());
@@ -74,6 +86,10 @@ class HarEncoder
         ];
     }
 
+    /**
+     * @param array<string, array<int, string>> $headers Headers map.
+     * @return array<int, array<string, string>>
+     */
     private function formatHeaders(array $headers): array
     {
         $formatted = [];
@@ -89,6 +105,10 @@ class HarEncoder
         return $formatted;
     }
 
+    /**
+     * @param array<string, mixed> $query Query params.
+     * @return array<int, array<string, string>>
+     */
     private function formatQuery(array $query): array
     {
         $formatted = [];
@@ -102,6 +122,11 @@ class HarEncoder
         return $formatted;
     }
 
+    /**
+     * @param \Psr\Http\Message\ServerRequestInterface $request Request instance.
+     * @param string $body Request body text.
+     * @return array<string, string>
+     */
     private function formatPostData(ServerRequestInterface $request, string $body): array
     {
         $mimeType = $request->getHeaderLine('Content-Type');
@@ -112,6 +137,10 @@ class HarEncoder
         ];
     }
 
+    /**
+     * @param string $body Body text.
+     * @return string
+     */
     private function truncateBody(string $body): string
     {
         $max = (int)($this->config['maxBodySize'] ?? 1048576);
@@ -125,12 +154,12 @@ class HarEncoder
         return substr($body, 0, $max);
     }
 
-    private function readStream($stream): string
+    /**
+     * @param \Psr\Http\Message\StreamInterface $stream Stream instance.
+     * @return string
+     */
+    private function readStream(StreamInterface $stream): string
     {
-        if ($stream === null) {
-            return '';
-        }
-
         $contents = (string)$stream;
         if (is_object($stream) && method_exists($stream, 'isSeekable') && $stream->isSeekable()) {
             $stream->rewind();

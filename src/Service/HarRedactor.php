@@ -1,5 +1,4 @@
 <?php
-
 declare(strict_types=1);
 
 namespace JamisonBryant\CakephpHarRecorder\Service;
@@ -8,11 +7,20 @@ class HarRedactor
 {
     private array $config;
 
+    /**
+     * @param array<string, mixed> $config Configuration options.
+     */
     public function __construct(array $config = [])
     {
         $this->config = $config;
     }
 
+    /**
+     * Apply redactions to a HAR array.
+     *
+     * @param array<string, mixed> $har HAR data.
+     * @return array<string, mixed>
+     */
     public function apply(array $har): array
     {
         $redactions = $this->config['redactions'] ?? [];
@@ -31,12 +39,19 @@ class HarRedactor
         return $har;
     }
 
+    /**
+     * @param mixed $data Target data.
+     * @param array<int, array<string, mixed>> $tokens Parsed tokens.
+     * @param string $regex Regular expression for replacement.
+     * @return void
+     */
     private function applyPath(mixed &$data, array $tokens, string $regex): void
     {
         if ($tokens === []) {
             if (is_string($data)) {
                 $data = preg_replace($regex, '[REDACTED]', $data) ?? $data;
             }
+
             return;
         }
 
@@ -48,6 +63,7 @@ class HarRedactor
                 }
                 unset($item);
             }
+
             return;
         }
 
@@ -60,6 +76,7 @@ class HarRedactor
             if (array_key_exists($index, $data)) {
                 $this->applyPath($data[$index], $tokens, $regex);
             }
+
             return;
         }
 
@@ -69,6 +86,10 @@ class HarRedactor
         }
     }
 
+    /**
+     * @param string $path Redaction path.
+     * @return array<int, array<string, mixed>>
+     */
     private function parsePath(string $path): array
     {
         $tokens = [];
@@ -111,6 +132,10 @@ class HarRedactor
         return $tokens;
     }
 
+    /**
+     * @param string $content Bracket token content.
+     * @return array<string, mixed>
+     */
     private function parseBracketToken(string $content): array
     {
         $content = trim($content);

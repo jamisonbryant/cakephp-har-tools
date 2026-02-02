@@ -35,7 +35,7 @@
     "phpstan": "tools/phpstan analyse",
     "stan": "@phpstan",
     "stan-baseline": "tools/phpstan --generate-baseline",
-    "stan-setup": "phive install",
+    "stan-setup": "php tools/phive install",
     "test-coverage": "phpunit --coverage-clover=clover.xml"
   },
   "extra": {

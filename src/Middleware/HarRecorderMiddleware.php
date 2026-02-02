@@ -1,5 +1,4 @@
 <?php
-
 declare(strict_types=1);
 
 namespace JamisonBryant\CakephpHarRecorder\Middleware;
@@ -20,11 +19,17 @@ class HarRecorderMiddleware implements MiddlewareInterface
     private HarEncoder $encoder;
     private HarRedactor $redactor;
 
+    /**
+     * @param array<string, mixed> $config Configuration options.
+     * @param \JamisonBryant\CakephpHarRecorder\Service\HarWriter|null $writer HAR writer.
+     * @param \JamisonBryant\CakephpHarRecorder\Service\HarEncoder|null $encoder HAR encoder.
+     * @param \JamisonBryant\CakephpHarRecorder\Service\HarRedactor|null $redactor HAR redactor.
+     */
     public function __construct(
         array $config = [],
         ?HarWriter $writer = null,
         ?HarEncoder $encoder = null,
-        ?HarRedactor $redactor = null
+        ?HarRedactor $redactor = null,
     ) {
         $this->config = $config;
         $this->writer = $writer ?? new HarWriter($config);
@@ -32,6 +37,11 @@ class HarRecorderMiddleware implements MiddlewareInterface
         $this->redactor = $redactor ?? new HarRedactor($config);
     }
 
+    /**
+     * @param \Psr\Http\Message\ServerRequestInterface $request Request instance.
+     * @param \Psr\Http\Server\RequestHandlerInterface $handler Request handler.
+     * @return \Psr\Http\Message\ResponseInterface
+     */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         $startedAt = microtime(true);
@@ -47,6 +57,11 @@ class HarRecorderMiddleware implements MiddlewareInterface
         return $response;
     }
 
+    /**
+     * Build the HAR filename from config and placeholders.
+     *
+     * @return string
+     */
     private function buildFilename(): string
     {
         $pattern = $this->config['filenamePattern'] ?? 'har-{date}-{uniqid}.har';

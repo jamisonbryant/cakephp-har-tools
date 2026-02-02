@@ -1,6 +1,7 @@
 <?php
-
 declare(strict_types=1);
+
+use Cake\Core\Configure;
 
 require dirname(__DIR__) . '/vendor/autoload.php';
 
@@ -9,4 +10,4 @@ if (!defined('DS')) {
 }
 
 // Ensure core defaults exist for CakePHP HTTP classes in tests.
-Cake\Core\Configure::write('App.encoding', 'UTF-8');
+Configure::write('App.encoding', 'UTF-8');

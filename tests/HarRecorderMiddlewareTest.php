@@ -1,16 +1,18 @@
 <?php
-
 declare(strict_types=1);
 
 namespace JamisonBryant\CakephpHarRecorder\Test;
 
 use Cake\Http\Response;
 use Cake\Http\ServerRequest;
+use FilesystemIterator;
 use JamisonBryant\CakephpHarRecorder\Middleware\HarRecorderMiddleware;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
 
 class HarRecorderMiddlewareTest extends TestCase
 {
@@ -53,6 +55,7 @@ class HarRecorderMiddlewareTest extends TestCase
             public function handle(ServerRequestInterface $request): ResponseInterface
             {
                 $response = new Response();
+
                 return $response->withStringBody('ok');
             }
         };
@@ -92,6 +95,7 @@ class HarRecorderMiddlewareTest extends TestCase
             public function handle(ServerRequestInterface $request): ResponseInterface
             {
                 $response = new Response();
+
                 return $response->withStringBody('0123456789');
             }
         };
@@ -110,15 +114,16 @@ class HarRecorderMiddlewareTest extends TestCase
 
     private function deleteDirectory(string $path): void
     {
-        $iterator = new \RecursiveDirectoryIterator($path, \FilesystemIterator::SKIP_DOTS);
-        $files = new \RecursiveIteratorIterator($iterator, \RecursiveIteratorIterator::CHILD_FIRST);
+        $iterator = new RecursiveDirectoryIterator($path, FilesystemIterator::SKIP_DOTS);
+        $files = new RecursiveIteratorIterator($iterator, RecursiveIteratorIterator::CHILD_FIRST);
         foreach ($files as $file) {
+            $target = $file->getPathname();
             if ($file->isDir()) {
-                @rmdir($file->getPathname());
+                rmdir($target);
                 continue;
             }
-            @unlink($file->getPathname());
+            unlink($target);
         }
-        @rmdir($path);
+        rmdir($path);
     }
 }

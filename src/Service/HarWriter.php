@@ -1,5 +1,4 @@
 <?php
-
 declare(strict_types=1);
 
 namespace JamisonBryant\CakephpHarRecorder\Service;
@@ -11,11 +10,21 @@ class HarWriter
 {
     private array $config;
 
+    /**
+     * @param array<string, mixed> $config Configuration options.
+     */
     public function __construct(array $config = [])
     {
         $this->config = $config;
     }
 
+    /**
+     * Write HAR content to disk.
+     *
+     * @param array<string, mixed> $har HAR data.
+     * @param string $filename Target filename.
+     * @return void
+     */
     public function write(array $har, string $filename): void
     {
         $directory = $this->config['outputDir'] ?? 'logs/har';
@@ -38,7 +47,9 @@ class HarWriter
         }
 
         if (!rename($tmpPath, $finalPath)) {
-            @unlink($tmpPath);
+            if (is_file($tmpPath)) {
+                unlink($tmpPath);
+            }
             throw new RuntimeException(sprintf('Unable to finalize HAR file: %s', $finalPath));
         }
     }
