@@ -50,6 +50,11 @@ class HarRedactor
         if ($tokens === []) {
             if (is_string($data)) {
                 $data = preg_replace($regex, '[REDACTED]', $data) ?? $data;
+            } elseif (is_array($data)) {
+                $name = $data['name'] ?? null;
+                if (is_string($name) && preg_match($regex, $name) === 1) {
+                    $data['value'] = '[REDACTED]';
+                }
             }
 
             return;

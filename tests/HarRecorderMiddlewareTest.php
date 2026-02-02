@@ -112,6 +112,80 @@ class HarRecorderMiddlewareTest extends TestCase
         $this->assertSame('01234', $text);
     }
 
+    public function testHeaderAndJsonKeyRedactions(): void
+    {
+        $this->outputDir = sys_get_temp_dir() . DS . 'cakephp-har-recorder-' . uniqid();
+        $config = [
+            'outputDir' => $this->outputDir,
+            'filenamePattern' => 'test-{uniqid}.har',
+            'redactions' => [
+                'log.entries[*].request.headers[*]' => '/^(authorization|cookie|x-api-key|proxy-authorization)$/i',
+                'log.entries[*].response.headers[*]' => '/^(authorization|cookie|x-api-key|proxy-authorization)$/i',
+                'log.entries[*].request.postData.text' => '/"(token|access_token|refresh_token|password|secret|api_key)"\\s*:\\s*"[^"]*"/i',
+                'log.entries[*].response.content.text' => '/"(token|access_token|refresh_token|password|secret|api_key)"\\s*:\\s*"[^"]*"/i',
+            ],
+        ];
+
+        $middleware = new HarRecorderMiddleware($config);
+
+        $request = new ServerRequest([
+            'environment' => [
+                'REQUEST_METHOD' => 'POST',
+                'REQUEST_URI' => '/test',
+                'CONTENT_TYPE' => 'application/json',
+                'HTTP_AUTHORIZATION' => 'Bearer secret-token',
+                'HTTP_COOKIE' => 'session=secret',
+                'HTTP_X_API_KEY' => 'api-key',
+                'HTTP_PROXY_AUTHORIZATION' => 'Basic secret',
+            ],
+            'input' => '{"token":"secret","password":"p","nested":{"api_key":"k"}}',
+        ]);
+
+        $handler = new class implements RequestHandlerInterface {
+            public function handle(ServerRequestInterface $request): ResponseInterface
+            {
+                $response = new Response();
+
+                return $response
+                    ->withHeader('Content-Type', 'application/json')
+                    ->withStringBody('{"access_token":"a","refresh_token":"r"}');
+            }
+        };
+
+        $middleware->process($request, $handler);
+
+        $files = glob($this->outputDir . DS . 'test-*.har');
+        $this->assertNotEmpty($files, 'Expected at least one HAR file to be written.');
+
+        $har = json_decode((string)file_get_contents($files[0]), true);
+        $this->assertIsArray($har);
+
+        $headers = $har['log']['entries'][0]['request']['headers'] ?? [];
+        $headerMap = [];
+        foreach ($headers as $header) {
+            if (!is_array($header)) {
+                continue;
+            }
+            $name = $header['name'] ?? null;
+            $value = $header['value'] ?? null;
+            if (!is_string($name) || !is_string($value)) {
+                continue;
+            }
+            $headerMap[strtolower($name)] = $value;
+        }
+
+        $this->assertSame('[REDACTED]', $headerMap['authorization'] ?? null);
+        $this->assertSame('[REDACTED]', $headerMap['cookie'] ?? null);
+        $this->assertSame('[REDACTED]', $headerMap['x-api-key'] ?? null);
+        $this->assertSame('[REDACTED]', $headerMap['proxy-authorization'] ?? null);
+
+        $requestText = $har['log']['entries'][0]['request']['postData']['text'] ?? '';
+        $this->assertStringContainsString('[REDACTED]', $requestText);
+
+        $responseText = $har['log']['entries'][0]['response']['content']['text'] ?? '';
+        $this->assertStringContainsString('[REDACTED]', $responseText);
+    }
+
     private function deleteDirectory(string $path): void
     {
         $iterator = new RecursiveDirectoryIterator($path, FilesystemIterator::SKIP_DOTS);
