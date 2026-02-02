@@ -8,3 +8,6 @@ parameters:
 	ignoreErrors:
 		- identifier: missingType.generics
 		- identifier: missingType.iterableValue
+	parallel:
+		maximumNumberOfProcesses: 1
+		minimumNumberOfJobsPerProcess: 1

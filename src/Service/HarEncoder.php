@@ -113,9 +113,16 @@ class HarEncoder
     {
         $formatted = [];
         foreach ($query as $name => $value) {
+            $encoded = '';
+            if (!is_scalar($value)) {
+                $encoded = json_encode($value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+                if ($encoded === false) {
+                    $encoded = '';
+                }
+            }
             $formatted[] = [
                 'name' => (string)$name,
-                'value' => is_scalar($value) ? (string)$value : json_encode($value),
+                'value' => is_scalar($value) ? (string)$value : $encoded,
             ];
         }
 
@@ -161,7 +168,7 @@ class HarEncoder
     private function readStream(StreamInterface $stream): string
     {
         $contents = (string)$stream;
-        if (is_object($stream) && method_exists($stream, 'isSeekable') && $stream->isSeekable()) {
+        if ($stream->isSeekable()) {
             $stream->rewind();
         }
 
