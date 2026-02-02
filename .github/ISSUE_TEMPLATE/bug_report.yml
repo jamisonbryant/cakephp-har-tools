@@ -1,0 +1,44 @@
+name: Bug report
+description: Report a problem with cakephp-har-recorder
+labels: ["bug"]
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      description: Describe the bug and expected behavior.
+      placeholder: I expected ... but ...
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Provide a minimal, reproducible example.
+      placeholder: |
+        1. ...
+        2. ...
+    validations:
+      required: true
+  - type: input
+    id: plugin-version
+    attributes:
+      label: Plugin version
+      placeholder: e.g. 0.1.0
+    validations:
+      required: true
+  - type: input
+    id: cakephp-version
+    attributes:
+      label: CakePHP version
+      placeholder: e.g. 5.0.0
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant logs/stack trace
+      description: Paste any error output.
+      render: shell
+    validations:
+      required: false

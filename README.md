@@ -1,16 +1,25 @@
 # CakephpHarRecorder
 
+[![CI](https://github.com/jamisonbryant/cakephp-har-recorder/actions/workflows/ci.yml/badge.svg)](https://github.com/jamisonbryant/cakephp-har-recorder/actions/workflows/ci.yml)
+[![Latest Stable Version](https://img.shields.io/packagist/v/jamisonbryant/cakephp-har-recorder?style=flat-square)](https://packagist.org/packages/jamisonbryant/cakephp-har-recorder)
+[![Total Downloads](https://img.shields.io/packagist/dt/jamisonbryant/cakephp-har-recorder?style=flat-square)](https://packagist.org/packages/jamisonbryant/cakephp-har-recorder/stats)
+[![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE)
+
 A CakePHP 5 plugin that records HTTP requests and responses as HAR (HTTP Archive) files via middleware.
 
-## Install
+## Recording, not replaying
 
-Add the plugin to your project:
+This plugin focuses on capturing HAR output for debugging, support, and audit trails. It does not replay or mock HTTP traffic.
+
+## Installation
+
+You can install this plugin into your CakePHP application using composer:
 
 ```
 composer require jamisonbryant/cakephp-har-recorder
 ```
 
-Load the plugin in your application:
+Then load the plugin:
 
 ```php
 // in src/Application.php
@@ -55,6 +64,14 @@ Redaction keys use a JMESPath-like subset supporting:
 - Quoted keys: `['key-name']` or `["key-name"]`
 
 Matches apply regex replacement with `[REDACTED]`.
+
+## Documentation
+
+This README and `config/har_recorder.php` are the primary documentation for now.
+
+## IDE compatibility improvements
+
+No special IDE helpers are required. Standard PHP type hints and PSR interfaces provide autocomplete support.
 
 ## Notes
 
